@@ -1,0 +1,21 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.intime.share"
+        },
+        "cordova-share-extension-handler": {
+            "PACKAGE_NAME": "com.intime.share"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.intime.share"
+        }
+    },
+    "dependent_plugins": {}
+}
