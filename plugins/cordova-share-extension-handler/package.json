@@ -1,0 +1,22 @@
+{
+  "name": "cordova-share-extension-handler",
+  "version": "0.0.3",
+  "description": "Hadler for share extension",
+  "cordova": {
+    "id": "cordova-share-extension-handler",
+    "platforms": []
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shvarts/cordova-share-extension-handler.git"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Shvarts",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/Shvarts/cordova-share-extension-handler/issues"
+  },
+  "homepage": "https://github.com/Shvarts/cordova-share-extension-handler#readme"
+}
