@@ -32,61 +32,40 @@
   //Get pkpass NSData object through NSItemProvider
   //Store results in NSUserDefaults bridge
   [itemProvider loadItemForTypeIdentifier:@"com.apple.pkpass" options:nil completionHandler:^(id<NSSecureCoding>  _Nullable item, NSError * _Null_unspecified error) {
-    PKPass* obj = [[PKPass alloc] initWithData:item error:&error];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
       // Generate the file path
       NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
       NSString *documentsDirectory = [paths objectAtIndex:0];
       NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"myfile.pkpass"];
-      NSString *unzipPath = [documentsDirectory stringByAppendingPathComponent:@"pass.json"];
       
-      NSData *pobadata=[NSKeyedArchiver archivedDataWithRootObject:obj];
-      NSLog(@"%@", pobadata);
-      
-      // Save it into file system
-     
-      [userdata setObject:[[obj passURL] absoluteString] forKey:@"stringURL"];
-      [userdata setObject:pobadata forKey:@"pkpassData"];
-      NSLog(@"%@", dataPath); 
-      NSFileManager *fileManager = [NSFileManager defaultManager];
-      
-      [pobadata writeToFile:dataPath atomically:YES];
+      [((NSData*)item) writeToFile:dataPath atomically:YES];
       
       NSFileManager *filemanager = [NSFileManager defaultManager];
+      
       if ([filemanager fileExistsAtPath:dataPath]) {
         [SSZipArchive unzipFileAtPath:dataPath toDestination:documentsDirectory];
-        if ([filemanager fileExistsAtPath:unzipPath]) {
-          NSLog(@"Exists");
-        }
+        
+        NSString *unzipPath = [documentsDirectory stringByAppendingPathComponent:@"pass.json"];
+        
+        NSString *myJSON = [[NSString alloc] initWithContentsOfFile:unzipPath encoding:NSUTF8StringEncoding error:NULL];
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:[myJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil];
+        
+        NSDictionary *barcode = [json objectForKey:@"barcode"];
+        [userdata setObject:[barcode objectForKey:@"message"] forKey:@"barcodeMsg"];
       }
     });
-    //    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"intime://"]];
-    
-    //    [self.extensionContext openURL:[NSURL URLWithString:@"intime://"] completionHandler:^(BOOL success) {
-    //           NSLog(@"fun=%s after completion. success=%d", __func__, success);
-    //         }];
-    
-    
-    //    UIWebView * webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    //    NSString *urlString = @"intime://";
-    //    NSString * content = [NSString stringWithFormat : @"<head><meta http-equiv='refresh' content='0; URL=%@'></head>", urlString];
-    //    [webView loadHTMLString:content baseURL:nil];
-    //    [self.view addSubview:webView];
-    //    [webView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:2.0];
     
     // open url
-        NSURL *destinationURL = [NSURL URLWithString:@"intime://"];
+    NSURL *destinationURL = [NSURL URLWithString:@"intime://"];
     
-        // Get "UIApplication" class name through ASCII Character codes.
-        NSString *className = [[NSString alloc] initWithData:[NSData dataWithBytes:(unsigned char []){0x55, 0x49, 0x41, 0x70, 0x70, 0x6C, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6F, 0x6E} length:13] encoding:NSASCIIStringEncoding];
-        if (NSClassFromString(className)) {
-          id object = [NSClassFromString(className) performSelector:@selector(sharedApplication)];
-          [object performSelector:@selector(openURL:) withObject:destinationURL];
-        }
+    // Get "UIApplication" class name through ASCII Character codes.
+    NSString *className = [[NSString alloc] initWithData:[NSData dataWithBytes:(unsigned char []){0x55, 0x49, 0x41, 0x70, 0x70, 0x6C, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6F, 0x6E} length:13] encoding:NSASCIIStringEncoding];
+    if (NSClassFromString(className)) {
+      id object = [NSClassFromString(className) performSelector:@selector(sharedApplication)];
+      [object performSelector:@selector(openURL:) withObject:destinationURL];
+    }
     // open url
-    
-    [userdata setObject:[[obj passURL] absoluteString] forKey:@"pkpassFile"];
-    [userdata setObject:item forKey:@"pkpassDataFile"];
   }];
   
   [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];

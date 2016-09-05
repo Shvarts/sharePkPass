@@ -48,78 +48,70 @@ var app = {
 
             console.log('PkPass file successfully received:' + JSON.stringify(result));
         
-            var blob = new Blob([result], {type: 'application/vnd.apple.pkpass'});
-var fileReader = new FileReader();
-                                                                                     fileReader.onload = function (evt) {
-                                                                                     // Read out file contents as a Data URL
-                                                                                     var result = evt.target.result;
-                                                                                     // Set image src to Data URL
-//                                                                                     rhino.setAttribute("src", result);
-                                                                                     // Store Data URL in localStorage
-                                                                                     try {
-//                                                                                     localStorage.setItem("rhino", result);
-//                                                                                     console.log(result);
-                                                                                     zip.createReader(new zip.TextReader(result), function(reader) {
-                                                                                                      
-                                                                                                      // get all entries from the zip
-                                                                                                      reader.getEntries(function(entries) {
-                                                                                                                        if (entries.length) {
-                                                                                                                        
-                                                                                                                        // get first entry content as text
-                                                                                                                        entries[0].getData(new zip.TextWriter(), function(text) {
-                                                                                                                                           // text contains the entry data as a String
-                                                                                                                                           console.log(text);
-                                                                                                                                           
-                                                                                                                                           // close the zip reader
-                                                                                                                                           reader.close(function() {
-                                                                                                                                                        // onclose callback
-                                                                                                                                                        });
-                                                                                                                                           
-                                                                                                                                           }, function(current, total) {
-                                                                                                                                           // onprogress callback
-                                                                                                                                           console.log(total);
-                                                                                                                                           });
-                                                                                                                        }
-                                                                                                                        }, function() {
-                                                                                                                        console.log(arguments);
-                                                                                                                        });
-                                                                                                      }, function(error) {
-                                                                                                      // onerror callback
-                                                                                                      console.log(error);
-                                                                                                      });
+            // var blob = new Blob([result], {type: 'application/vnd.apple.pkpass'});
 
-                                                                                     }
-                                                                                     catch (e) {
-                                                                                     console.log("Storage failed: " + e);
-                                                                                     }
-                                                                                     };
-                                                                                     // Load blob as Data URL
-                                                                                     fileReader.readAsDataURL(blob);
-            
-            // window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function (entry) { // jshint ignore: line 
-            //     console.log('cdvfile URI: ' + entry.toInternalURL());
+            // zip.createReader(new zip.BlobReader(blob), function(reader) {
 
-            //     entry.getFile('myfile.pkpass', { create: false, exclusive: false }, function (fileEntry) {
-            //             // writeFile(fileEntry, fileData);
-            //             console.log(fileEntry);
-            //             fileEntry.file(function (file) {
-            //                 var reader = new FileReader();
+            //   // get all entries from the zip
+            //     reader.getEntries(function(entries) {
+            //         if (entries.length) {
 
-            //                 reader.onloadend = function() {
-            //                     console.log("Successful file read: " + this.result);
-            //                 };
+            //           // get first entry content as text
+            //           entries[0].getData(new zip.TextWriter(), function(text) {
+            //             // text contains the entry data as a String
+            //             console.log(text);
 
-            //                 reader.readAsText(file);
+            //             // close the zip reader
+            //             reader.close(function() {
+            //               // onclose callback
+            //             });
 
-            //                 }, function() {
-            //                     console.log(arguments);
-            //                 });
-            //         }, function() {
-            //             console.log(arguments);
-            //         });
+            //           }, function(current, total) {
+            //             // onprogress callback
+            //             console.log(total);
+            //           });
+            //         }
             //     }, function() {
-            //     console.log(arguments);
+            //         console.log(arguments);
+            //     });
+            // }, function(error) {
+            //   // onerror callback
+            //     console.log(error);
             // });
+
+            window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function (entry) { // jshint ignore: line
+                console.log('cdvfile URI: ' + entry.toInternalURL());
+                var directoryReader = entry.createReader();
+
+                                             directoryReader.readEntries(function(entries){
+                                                                         for (var i=0; i<entries.length; i++) {
+                                                                            console.log(entries[i].name);
+                                                                         }
+                                                                         }, function() {
+                                                                            console.log(arguments);
+                                                                         });
+
+//                entry.getFile('pass.json', { create: false, exclusive: false }, function (fileEntry) {
+//                        // writeFile(fileEntry, fileData);
+//                        console.log(fileEntry);
+//                        fileEntry.file(function (file) {
+//                            var reader = new FileReader();
+//
+//                            reader.onloadend = function() {
+//                                console.log("Successful file read: " + this.result);
+//                            };
+//
+//                            reader.readAsText(file);
+//
+//                            }, function() {
+//                                console.log(arguments);
+//                            });
+//                    }, function() {
+//                        console.log(arguments);
+//                    });
+                }, function() {
+                console.log(arguments);
+            });
 
             // pkpassData = boardingService.parseBoardingPass(result.message);
             // pkpassData.url = result.url;
@@ -135,7 +127,7 @@ var fileReader = new FileReader();
             //     checkJourneys(journeysData.journeys, pkpassData.bookingCode, pkpassData.lastName, pkpassData);
             // }
 
-            window.cordova.plugins.ShareExtensionHandler.deletePkpass();
+//            window.cordova.plugins.ShareExtensionHandler.deletePkpass();
         }, false);
     },
     // Update DOM on a Received Event
