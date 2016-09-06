@@ -1,4 +1,5 @@
 cordova.define("cordova-share-extension-handler.ShareExtensionHandler", function(require, exports, module) {
+cordova.define("cordova-share-extension-handler.ShareExtensionHandler", function(require, exports, module) {
    module.exports = {
 	   getJsonDataFromSharedPkpassFile: function(params, successCallback) {
 		   cordova.exec(successCallback,
@@ -15,4 +16,6 @@ cordova.define("cordova-share-extension-handler.ShareExtensionHandler", function
 		                [params]);
 	   }
    };
+});
+
 });

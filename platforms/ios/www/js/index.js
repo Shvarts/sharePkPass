@@ -35,99 +35,23 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
-        zip.workerScriptsPath = "lib/";
-        // zip.useWebWorkers = false;
     },
 
     onResume: function() {
-        var keys = ['message', 'seat', 'flight', 'filekey', 'passenger', 'date', 'pkPassLocalFilePath'];
-
         console.log('Starting to get shared Pk Pass file...');
-        window.cordova.plugins.ShareExtensionHandler.getJsonDataFromSharedPkpassFile(keys, function (result) {
-            // var pkpassData = {};
+        window.cordova.plugins.ShareExtensionHandler.getJsonDataFromSharedPkpassFile(function (result) {
+            var pkpassData = {};
 
             console.log('PkPass file successfully received:' + JSON.stringify(result));
-        
-            // var blob = new Blob([result], {type: 'application/vnd.apple.pkpass'});
 
-            // zip.createReader(new zip.BlobReader(blob), function(reader) {
+            pkpassData = boardingService.parseBoardingPass(result.message);
 
-            //   // get all entries from the zip
-            //     reader.getEntries(function(entries) {
-            //         if (entries.length) {
+            if (pkpassData.bookingCode && pkpassData.lastName) {
+                journeysData = journeysService.getJourneysFromLocalStorage();
+                checkJourneys(journeysData.journeys, pkpassData.bookingCode, pkpassData.lastName, pkpassData);
+            }
 
-            //           // get first entry content as text
-            //           entries[0].getData(new zip.TextWriter(), function(text) {
-            //             // text contains the entry data as a String
-            //             console.log(text);
-
-            //             // close the zip reader
-            //             reader.close(function() {
-            //               // onclose callback
-            //             });
-
-            //           }, function(current, total) {
-            //             // onprogress callback
-            //             console.log(total);
-            //           });
-            //         }
-            //     }, function() {
-            //         console.log(arguments);
-            //     });
-            // }, function(error) {
-            //   // onerror callback
-            //     console.log(error);
-            // });
-
-            window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function (entry) { // jshint ignore: line
-                console.log('cdvfile URI: ' + entry.toInternalURL());
-                var directoryReader = entry.createReader();
-
-                                             directoryReader.readEntries(function(entries){
-                                                                         for (var i=0; i<entries.length; i++) {
-                                                                            console.log(entries[i].name);
-                                                                         }
-                                                                         }, function() {
-                                                                            console.log(arguments);
-                                                                         });
-
-//                entry.getFile('pass.json', { create: false, exclusive: false }, function (fileEntry) {
-//                        // writeFile(fileEntry, fileData);
-//                        console.log(fileEntry);
-//                        fileEntry.file(function (file) {
-//                            var reader = new FileReader();
-//
-//                            reader.onloadend = function() {
-//                                console.log("Successful file read: " + this.result);
-//                            };
-//
-//                            reader.readAsText(file);
-//
-//                            }, function() {
-//                                console.log(arguments);
-//                            });
-//                    }, function() {
-//                        console.log(arguments);
-//                    });
-                }, function() {
-                console.log(arguments);
-            });
-
-            // pkpassData = boardingService.parseBoardingPass(result.message);
-            // pkpassData.url = result.url;
-            // pkpassData.seatNum = result.seat === "(null)" ? '' : result.seat;
-            // pkpassData.flightNum = result.flight;
-            // pkpassData.bookingCode = result.filekey;
-            // pkpassData.lastName = result.passenger.split(', ')[0];
-            // pkpassData.flightDate = result.date || null;
-            // console.log('PkPass file converted successfully:' + JSON.stringify(pkpassData));
-
-            // if (pkpassData.bookingCode && pkpassData.lastName) {
-            //     journeysData = journeysService.getJourneysFromLocalStorage();
-            //     checkJourneys(journeysData.journeys, pkpassData.bookingCode, pkpassData.lastName, pkpassData);
-            // }
-
-//            window.cordova.plugins.ShareExtensionHandler.deletePkpass();
+            window.cordova.plugins.ShareExtensionHandler.deletePkpass();
         }, false);
     },
     // Update DOM on a Received Event
